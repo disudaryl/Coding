@@ -1,0 +1,28 @@
+import turtle
+
+i=turtle.Turtle ()
+i.screen.bgcolor("black")
+i.pensize (2)
+i.color ("green")
+i.left(90)
+i.backward(100)
+i.speed (100)
+
+def tree(d):
+    if d < 10:
+        return
+    else:
+        i.forward(d)
+        i.color('pink')
+        i.circle(2)
+        i.color('brown')
+
+        i.left(25)
+        tree(3 * d / 4)
+        i.right(50)
+        tree(3 * d / 4)
+        i.left(25)
+
+        i.backward(d)
+tree(100)
+turtle.done()

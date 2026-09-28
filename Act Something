@@ -1,0 +1,157 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import turtle
+import math
+
+class FileViewer:
+    def __init__(self, filename="Record.xlsx"):
+        self.filename = filename
+        self.data = None
+
+    def get_age_grp(self, age):
+            if age <= 14:
+                return "Minor"
+            elif age <= 25:
+                return "Youth"
+            elif age <= 65:
+                return "Adult"
+            else:
+                return "Senior"
+            
+    def fileload(self):
+        try:
+            self.data = pd.read_excel(self.filename)
+            self.data["Category"] = self.data["Age"].apply(self.get_age_grp)
+            print(f"'{self.filename}' loaded successfully! ({len(self.data)} records found)\n")
+
+        except FileNotFoundError:
+            print(f"'{self.filename}' not found. Make sure it's in the same folder!\n")
+
+        except Exception as e:
+            print(f"Something went wrong while loading the file: {e}\n")
+            return
+
+    def view_by_gender(self):
+        if self.data is None:
+            print("PLease load the file first (option 1).\n")
+            return
+
+        print("-" * 30 + "\n" + "   Records by Gender\n" + "-" * 30)
+        sorted_data = self.data.sort_values("Gender")
+        print(sorted_data[["Name", "Age", "Gender"]].to_string(index=False))
+        print()
+
+        counts = self.data["Gender"].value_counts()
+        plt.figure(figsize=(6,4))
+        plt.bar(counts.index, counts.values, color=["#4C9BE8", "#E8739B"])
+        plt.title("Records by Gender")
+        plt.xlabel("Gender")
+        plt.ylabel("Number of Records")
+        plt.yticks(range(0, int(counts.max()) + 2))
+        plt.tight_layout()
+        plt.show()
+
+    def view_by_category(self):
+        if self.data is None:
+            print("PLease load the file first (option 1).\n")
+            return
+        
+        print("-" * 30 + "\n" + "   Records by Category\n" + "-" * 30)
+        sorted_data = self.data.sort_values("Category")
+        print(sorted_data[["Name", "Age", "Gender"]].to_string(index=False))
+        print()
+
+        print("\n" + "-" * 5 + "Category Count" + "-" * 5)
+        counts = self.data["Category"].value_counts()
+        groups = ["Minor", "Youth", "Adult", "Senior"]
+        values = []
+        for group in groups:
+            print(f"{group:<10}: {counts.get(group, 0)}")
+            values.append(counts.get(group, 0))
+        print()
+
+        plt.figure(figsize=(6,4))
+        plt.bar(groups, values, color=["#7BC67E", "#4C9BE8", "#F5B942", "#B57BE8"])
+        plt.title("Records by Category")
+        plt.xlabel("Category")
+        plt.ylabel("Number of Records")
+        plt.yticks(range(0, int(counts.max()) + 2))
+        plt.tight_layout()
+        plt.show()
+
+    def view_gender_and_category(self):
+        if self.data is None:
+            print("PLease load the file first (option 1).\n")
+            return
+
+        print("-" * 30 + "\n" + "   Records by Gender and Category\n" + "-" * 30)
+        sorted_data = self.data.sort_values(["Gender", "Category"])
+        print(sorted_data[["Name", "Age", "Gender", "Category"]].to_string(index=False))
+        print()
+
+        groups = ["Minor", "Youth", "Adult", "Senior"]
+        table = pd.crosstab(self.data["Category"], self.data["Gender"]).reindex(groups, fill_value=0)
+        ax = table.plot(kind="bar", figsize=(7, 4), rot=0)
+        ax.set_title("Records by Gender and Category")
+        ax.set_xlabel("Category")
+        ax.set_ylabel("Number of Records")
+        ax.set_yticks(range(0, int(table.values.max()) + 2))
+        plt.tight_layout()
+        plt.show()
+
+    def menu(self):
+        print("=" * 5 + "EXCEL RECORD VIEWER" + "=" * 5)
+        print("1. Load", "\n2. View", "\n3. Exit")
+
+view = FileViewer()
+
+while True:
+    view.menu()
+    choice = input("Select an Option (1-3): ")
+
+    if choice == "1":
+        view.fileload()
+
+    elif choice == "2":
+        print("a. By Gender", "\nb. By Categorize", "\nc. By Gender and Categorize")
+        sub = input("Choose an option: ")
+
+        if sub == "a":
+            view.view_by_gender()
+        elif sub == "b":
+            view.view_by_category()
+        elif sub == "c":
+            view.view_gender_and_category()
+        else:
+            print("Invalid option.\n")
+
+    elif choice == "3":
+        print("Goodbye!")
+        break
+
+    else:
+        screen = turtle.Screen()
+        screen.bgcolor("black")
+
+        i = turtle.Turtle()
+
+        i.speed(1)
+        i.hideturtle()
+        i.penup()
+        i.color("#b91831")
+
+        for scale in range(11, 17):
+            for t in range(120):
+                angle = t * (math.pi * 2) / 120
+
+                x = 16 * (math.sin(angle) ** 3) * scale
+
+                y = (13 * math.cos(angle) - 5 * math.cos(2 * angle) - 2 * math.cos(3 * 
+                angle) - math.cos(4 * angle)) * scale
+
+                i.goto(x, y)
+                i.write("Invalid Choice!",
+                        align="center", font=("Arial", 8,
+                        "bold"))
+
+        turtle.done
